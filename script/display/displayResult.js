@@ -79,7 +79,7 @@ function generateHistoryTable(reference, numFrames, timeSlice, pageFault, algori
   let html = '<thead><tr>';
   
   // First column header
-  html += `<th class="table-center" style="background: var(--gray-100);">Priority</th>`;
+  html += `<th class="table-center" style="background: var(--gray-100);">Frame</th>`;
   
   // Header row
   reference.forEach((ref, index) => {
