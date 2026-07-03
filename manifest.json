@@ -1,0 +1,21 @@
+{
+  "name": "Page Replacement Algorithm Visualizer",
+  "short_name": "Page Replacement",
+  "description": "Professional tool for visualizing and analyzing memory management algorithms",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["education", "productivity", "utilities"],
+  "lang": "en",
+  "dir": "ltr"
+}

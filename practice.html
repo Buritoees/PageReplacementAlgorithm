@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="description" content="Practice page replacement algorithms with interactive exercises">
+  <meta name="keywords" content="page replacement, algorithm, FIFO, LRU, practice, quiz, learning">
+  <meta name="theme-color" content="#1c1c1e">
+  
+  <title>Practice Mode - Page Replacement Algorithm Visualizer</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.min.css" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="assets/style.css">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <!-- Animated Background -->
+  <div class="background-effect"></div>
+  <canvas id="particle-canvas"></canvas>
+  
+  <!-- Navigation -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="container">
+      <div>
+        <a href="index.html" class="navbar-brand">
+          <i class="bi bi-cpu"></i>
+          Page Replacement Visualizer
+        </a>
+        <div class="practice-nav-buttons">
+          <a href="index.html" class="btn btn-secondary btn-back-practice">
+            <i class="bi bi-arrow-left"></i>
+            <span class="btn-text-desktop">Back to Simulator</span>
+          </a>
+          <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+            <i class="bi bi-moon-fill"></i>
+            <span>Dark</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Hero Section -->
+    <section class="hero" style="min-height: 40vh;">
+      <div class="container">
+        <h1 class="hero-title" style="font-size: 56px;">
+          Practice Mode
+        </h1>
+        <p class="hero-subtitle">
+          Test your understanding with randomly generated exercises. Fill in the tables and get instant feedback!
+        </p>
+        <div class="hero-badges">
+          <span class="badge">
+            <i class="bi bi-pencil-square"></i>
+            Interactive Practice
+          </span>
+          <span class="badge">
+            <i class="bi bi-check-circle-fill"></i>
+            Instant Feedback
+          </span>
+          <span class="badge">
+            <i class="bi bi-book"></i>
+            Step-by-Step Explanations
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Configuration Section -->
+    <section class="section">
+      <div class="container">
+        <div class="card card-elevated">
+          <h2 style="margin-bottom: 1.5rem;">
+            <i class="bi bi-gear-fill" style="margin-right: 0.5rem; color: var(--ios-blue);"></i>
+            Exercise Configuration
+          </h2>
+          
+          <div class="form-group">
+            <label class="form-label" for="practice-algorithm">
+              <i class="bi bi-cpu" style="margin-right: 0.5rem;"></i>
+              Select Algorithm
+            </label>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+              <button type="button" class="algorithm-select-btn active" data-algo="fifo">
+                <i class="bi bi-arrow-right-circle"></i>
+                FIFO
+              </button>
+              <button type="button" class="algorithm-select-btn" data-algo="lru">
+                <i class="bi bi-clock-history"></i>
+                LRU
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="practice-pages">
+              <i class="bi bi-file-text" style="margin-right: 0.5rem;"></i>
+              Number of Reference Pages (5-15)
+            </label>
+            <div class="input-group">
+              <input 
+                type="number" 
+                id="practice-pages" 
+                class="form-input" 
+                value="8" 
+                min="5"
+                max="15"
+                required
+              >
+              <button type="button" class="btn btn-outline btn-sm" id="decrease-pages">
+                <i class="bi bi-dash"></i>
+              </button>
+              <button type="button" class="btn btn-outline btn-sm" id="increase-pages">
+                <i class="bi bi-plus"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="practice-frames">
+              <i class="bi bi-layers" style="margin-right: 0.5rem;"></i>
+              Number of Frames (2-5)
+            </label>
+            <div class="input-group">
+              <input 
+                type="number" 
+                id="practice-frames" 
+                class="form-input" 
+                value="3" 
+                min="2"
+                max="5"
+                required
+              >
+              <button type="button" class="btn btn-outline btn-sm" id="decrease-frames">
+                <i class="bi bi-dash"></i>
+              </button>
+              <button type="button" class="btn btn-outline btn-sm" id="increase-frames">
+                <i class="bi bi-plus"></i>
+              </button>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-primary btn-lg" id="generate-exercise-btn" style="width: 100%;">
+            <i class="bi bi-shuffle"></i>
+            Generate Random Exercise
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Exercise Section -->
+    <section class="section hidden" id="exercise-section">
+      <div class="container">
+        <div class="card card-elevated">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+            <h2 style="margin: 0;">
+              <i class="bi bi-pencil-square" style="margin-right: 0.5rem; color: var(--ios-blue);"></i>
+              Exercise
+            </h2>
+            <button class="btn btn-secondary btn-new-exercise" id="new-exercise-btn">
+              <i class="bi bi-arrow-clockwise"></i>
+              New Exercise
+            </button>
+          </div>
+
+          <div class="alert alert-info" style="margin-bottom: 1.5rem;">
+            <i class="bi bi-info-circle" style="font-size: 1.5rem;"></i>
+            <div>
+              <strong style="display: block; margin-bottom: 0.25rem;">Instructions</strong>
+              <span style="font-size: 14px; opacity: 0.9;">
+                Fill in the frame contents for each step and mark whether each reference is a Fault (F) or Hit (H).
+                Click "Check Answer" when you're done to see how you did!
+              </span>
+            </div>
+          </div>
+
+          <div id="exercise-info" style="background: var(--gray-50); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
+            <!-- Exercise info will be inserted here -->
+          </div>
+
+          <div id="practice-table-container">
+            <!-- Practice table will be inserted here -->
+          </div>
+
+          <div class="btn-group" style="margin-top: 1.5rem;">
+            <button type="button" class="btn btn-primary btn-lg" id="check-answer-btn">
+              <i class="bi bi-check-circle-fill"></i>
+              Check Answer
+            </button>
+            <button type="button" class="btn btn-secondary btn-lg" id="show-solution-btn">
+              <i class="bi bi-eye-fill"></i>
+              Show Solution
+            </button>
+            <button type="button" class="btn btn-outline btn-lg" id="clear-answers-btn">
+              <i class="bi bi-x-circle"></i>
+              Clear Answers
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="section hidden" id="results-section">
+      <div class="container">
+        <div class="card card-elevated" id="score-card">
+          <!-- Score will be inserted here -->
+        </div>
+
+        <div class="card card-elevated" style="margin-top: 2rem;" id="explanation-card">
+          <h3 style="margin-bottom: 1rem;">
+            <i class="bi bi-book" style="margin-right: 0.5rem; color: var(--ios-blue);"></i>
+            Detailed Explanation
+          </h3>
+          <div id="explanation-content" class="explanation-scroll-container">
+            <!-- Explanation will be inserted here -->
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-main">
+        <div class="footer-info">
+          <div class="footer-brand-section">
+            <div class="footer-logo">
+              <i class="bi bi-cpu-fill"></i>
+              <span>Page Replacement Visualizer</span>
+            </div>
+            <p class="footer-tagline">
+              Interactive tool for understanding page replacement algorithms
+            </p>
+          </div>
+        </div>
+        
+        <div class="footer-divider"></div>
+        
+        <div class="footer-team">
+          <h4 class="team-label">Developed by</h4>
+          <div class="team-names">
+            <span class="team-member">Viron C. Bacani</span>
+            <span class="team-separator">•</span>
+            <span class="team-member">Nathalie B. Birao</span>
+            <span class="team-separator">•</span>
+            <span class="team-member">John Henry P. Labarento</span>
+            <span class="team-separator">•</span>
+            <span class="team-member">Christian A. Magin</span>
+            <span class="team-separator">•</span>
+            <span class="team-member">Kennmor M. Regua</span>
+          </div>
+        </div>
+        
+        <div class="footer-copyright">
+          <p>© 2026 Page Replacement Visualizer. Built for Operating Systems Education.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module" src="./script/practice.js"></script>
+  <script src="./script/effects/particleSystem.js"></script>
+</body>
+</html>

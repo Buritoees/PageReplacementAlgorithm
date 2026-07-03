@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="description" content="Professional page replacement algorithm visualizer for operating systems education">
+  <meta name="keywords" content="page replacement, algorithm, FIFO, LRU, operating systems, memory management">
+  <meta name="author" content="Page Replacement Visualizer">
+  <meta name="theme-color" content="#1c1c1e">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="Page Replacement Algorithm Visualizer">
+  <meta property="og:description" content="Interactive tool for visualizing memory management algorithms">
+  <meta property="og:type" content="website">
+  
+  <title>Page Replacement Algorithm Visualizer</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.min.css" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="assets/style.css">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <!-- Animated Background -->
+  <div class="background-effect"></div>
+  <canvas id="particle-canvas"></canvas>
+  
+  <!-- Navigation -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="container">
+      <div>
+        <a href="#" class="navbar-brand">
+          <i class="bi bi-cpu"></i>
+          Page Replacement Visualizer
+        </a>
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+            <i class="bi bi-sun-fill"></i>
+            <span>Light Mode</span>
+          </button>
+          <button class="download-btn disabled" id="download-btn" aria-label="Download results" disabled>
+            <i class="bi bi-download"></i>
+            <span>Download</span>
+            <span class="status-badge">
+              <i class="bi bi-x"></i>
+            </span>
+            <div class="download-tooltip">
+              <div class="download-tooltip-arrow"></div>
+              <div class="download-tooltip-content">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span>Simulate First to Download!</span>
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container">
+        <h1 class="hero-title">
+          Visualize Memory Management Algorithms
+        </h1>
+        <p class="hero-subtitle">
+          Interactive tool for understanding page replacement algorithms in operating systems. 
+          Analyze FIFO and LRU with real-time visualization and step-by-step explanations.
+        </p>
+        <div class="hero-badges">
+          <span class="badge">
+            <i class="bi bi-lightning-charge-fill"></i>
+            Real-time Simulation
+          </span>
+          <span class="badge">
+            <i class="bi bi-graph-up-arrow"></i>
+            Performance Metrics
+          </span>
+          <span class="badge">
+            <i class="bi bi-mortarboard-fill"></i>
+            Educational
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Algorithm Selection -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Select Algorithm</h2>
+          <p class="section-description">
+            Choose a page replacement algorithm to simulate
+          </p>
+        </div>
+        
+        <div class="algorithm-grid">
+          <div class="algorithm-card active" data-algorithm="fifo" tabindex="0" role="button" aria-pressed="true">
+            <div class="algorithm-card-icon">
+              <i class="bi bi-arrow-right-circle"></i>
+            </div>
+            <h3 class="algorithm-card-title">FIFO</h3>
+            <p class="algorithm-card-subtitle">First-In, First-Out</p>
+            <p class="algorithm-card-description">
+              Pages are replaced in the order they were loaded into memory. Simple queue-based approach.
+            </p>
+            <span class="algorithm-badge">Selected</span>
+          </div>
+          
+          <div class="algorithm-card" data-algorithm="lru" tabindex="0" role="button" aria-pressed="false">
+            <div class="algorithm-card-icon">
+              <i class="bi bi-clock-history"></i>
+            </div>
+            <h3 class="algorithm-card-title">LRU</h3>
+            <p class="algorithm-card-subtitle">Least Recently Used</p>
+            <p class="algorithm-card-description">
+              Replaces the page that hasn't been used for the longest time. Tracks access history.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Configuration Form -->
+    <section class="section">
+      <div class="container">
+        <div class="card card-elevated">
+          <h2 style="margin-bottom: 1.5rem;">
+            <i class="bi bi-sliders" style="margin-right: 0.5rem; color: var(--ios-blue);"></i>
+            Configuration
+          </h2>
+          
+          <form id="simulation-form">
+            <input type="hidden" id="algorithm" value="fifo">
+            
+            <div class="form-group">
+              <label class="form-label" for="num-frames">
+                <i class="bi bi-layers" style="margin-right: 0.5rem;"></i>
+                Number of Frames
+              </label>
+              <div class="input-group">
+                <input 
+                  type="number" 
+                  id="num-frames" 
+                  class="form-input" 
+                  value="3" 
+                  min="1"
+                  required
+                  aria-describedby="frames-help"
+                >
+                <button type="button" class="btn btn-outline btn-sm" id="decrease-frames" aria-label="Decrease frames">
+                  <i class="bi bi-dash"></i>
+                </button>
+                <button type="button" class="btn btn-outline btn-sm" id="increase-frames" aria-label="Increase frames">
+                  <i class="bi bi-plus"></i>
+                </button>
+              </div>
+              <span class="form-help" id="frames-help">
+                Number of memory frames (minimum 1)
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="ref-string">
+                <i class="bi bi-code-square" style="margin-right: 0.5rem;"></i>
+                Reference String
+              </label>
+              <input 
+                type="text" 
+                id="ref-string" 
+                class="form-input monospace" 
+                placeholder="e.g., 1 2 3 4 1 2 5 or A B C D A B C"
+                required
+                aria-describedby="ref-help"
+              >
+              <span class="form-help" id="ref-help">
+                Enter space-separated page numbers or letters (e.g., "1 2 3" or "A B C")
+              </span>
+              <span class="form-error hidden" id="ref-error" role="alert">
+                <i class="bi bi-exclamation-circle"></i>
+                Please enter a valid reference string
+              </span>
+            </div>
+            
+            <div class="quick-samples-section">
+              <div class="quick-samples-header">
+                <div class="quick-samples-title">
+                  <i class="bi bi-lightning-charge-fill"></i>
+                  <span>Quick Samples</span>
+                </div>
+                <p class="quick-samples-subtitle">Pre-configured reference strings for instant testing</p>
+              </div>
+              
+              <div class="quick-samples-grid">
+                <button type="button" class="sample-card" data-sample="1 2 3 4 1 2 5 1 2 3 4 5">
+                  <div class="sample-card-icon">
+                    <i class="bi bi-123"></i>
+                  </div>
+                  <div class="sample-card-content">
+                    <h4 class="sample-card-title">Numbers 1</h4>
+                    <p class="sample-card-sequence">1 2 3 4 1 2 5 1 2 3 4 5</p>
+                    <span class="sample-card-meta">12 pages</span>
+                  </div>
+                </button>
+                
+                <button type="button" class="sample-card" data-sample="7 0 1 2 0 3 0 4 2 3 0 3 2 1 2 0 1">
+                  <div class="sample-card-icon">
+                    <i class="bi bi-hash"></i>
+                  </div>
+                  <div class="sample-card-content">
+                    <h4 class="sample-card-title">Numbers 2</h4>
+                    <p class="sample-card-sequence">7 0 1 2 0 3 0 4 2 3 0 3...</p>
+                    <span class="sample-card-meta">17 pages</span>
+                  </div>
+                </button>
+                
+                <button type="button" class="sample-card" data-sample="A B C D A B E A B C D E">
+                  <div class="sample-card-icon">
+                    <i class="bi bi-alphabet-uppercase"></i>
+                  </div>
+                  <div class="sample-card-content">
+                    <h4 class="sample-card-title">Letters 1</h4>
+                    <p class="sample-card-sequence">A B C D A B E A B C D E</p>
+                    <span class="sample-card-meta">12 pages</span>
+                  </div>
+                </button>
+                
+                <button type="button" class="sample-card" data-sample="P Q R S P Q R S">
+                  <div class="sample-card-icon">
+                    <i class="bi bi-type"></i>
+                  </div>
+                  <div class="sample-card-content">
+                    <h4 class="sample-card-title">Letters 2</h4>
+                    <p class="sample-card-sequence">P Q R S P Q R S</p>
+                    <span class="sample-card-meta">8 pages</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+            
+            <div class="btn-group">
+              <button type="submit" class="btn btn-primary btn-lg" id="run-btn">
+                <i class="bi bi-play-fill"></i>
+                Run Simulation
+              </button>
+              <button type="button" class="btn btn-secondary btn-lg" id="upload-btn">
+                <i class="bi bi-camera-fill"></i>
+                Upload Image
+              </button>
+              <button type="button" class="btn btn-secondary btn-lg" id="reset-btn">
+                <i class="bi bi-arrow-counterclockwise"></i>
+                Reset
+              </button>
+              <a href="practice.html" class="btn btn-lg" id="practice-btn" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; border: none;">
+                <i class="bi bi-pencil-square"></i>
+                Practice Mode
+              </a>
+            </div>
+            
+            <!-- Hidden file input for image upload -->
+            <input type="file" id="image-upload" accept="image/*" capture="environment" style="display: none;">
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="section hidden" id="results-section">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Results</h2>
+          <p class="section-description">
+            Simulation output and performance metrics
+          </p>
+        </div>
+        
+        <!-- Performance Stats -->
+        <div class="stats-grid" id="stats-container">
+          <!-- Stats will be inserted here by JavaScript -->
+        </div>
+
+        <!-- Snapshot View -->
+        <div class="card card-elevated">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+            <h3 style="margin: 0;">
+              <i class="bi bi-camera" style="margin-right: 0.5rem; color: var(--ios-blue);"></i>
+              Snapshot View
+            </h3>
+            <button class="sync-toggle-btn sync-active" id="snapshot-sync-btn" aria-label="Toggle table synchronization">
+              <i class="bi bi-arrow-left-right"></i>
+              Synced
+            </button>
+          </div>
+          <div class="legend">
+            <div class="legend-item">
+              <span class="legend-color legend-color-fault"></span>
+              Page Fault
+            </div>
+            <div class="legend-item">
+              <span class="legend-color legend-color-hit"></span>
+              Page Hit
+            </div>
+          </div>
+          <div class="table-container">
+            <table class="table table-monospace" id="snapshot-table">
+              <!-- Table content will be inserted by JavaScript -->
+            </table>
+          </div>
+        </div>
+        
+        <!-- History View -->
+        <div class="card card-elevated" style="margin-top: 2rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+            <h3 style="margin: 0;">
+              <i class="bi bi-clock-history" style="margin-right: 0.5rem; color: var(--ios-blue);"></i>
+              History View
+            </h3>
+            <button class="sync-toggle-btn sync-active" id="history-sync-btn" aria-label="Toggle table synchronization">
+              <i class="bi bi-arrow-left-right"></i>
+              Synced
+            </button>
+          </div>
+          <div class="legend">
+            <div class="legend-item">
+              <span class="legend-color legend-color-fault"></span>
+              Page Fault
+            </div>
+            <div class="legend-item">
+              <span class="legend-color legend-color-hit"></span>
+              Page Hit
+            </div>
+          </div>
+          <div class="table-container">
+            <table class="table table-monospace" id="history-table">
+              <!-- Table content will be inserted by JavaScript -->
+            </table>
+          </div>
+        </div>
+        
+        <!-- Step-by-Step Solution -->
+        <div class="card card-elevated" id="solution-section" style="margin-top: 2rem;">
+          <h3 style="margin-bottom: 0.5rem;">
+            <i class="bi bi-journal-text" style="margin-right: 0.5rem; color: var(--ios-blue);"></i>
+            Step-by-Step Solution
+          </h3>
+          <p class="text-muted" style="margin-bottom: 1.5rem;">
+            Detailed explanation of each step in the simulation
+          </p>
+          <div id="solution-steps" class="solution-steps">
+            <!-- Solution steps will be inserted here -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Algorithm Information -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Algorithm Information</h2>
+          <p class="section-description">
+            Understanding page replacement algorithms
+          </p>
+        </div>
+        
+        <div class="algorithm-info-grid">
+          <div class="card algo-info-card">
+            <div class="algo-info-header">
+              <div class="algo-info-icon fifo-icon">
+                <i class="bi bi-arrow-right-circle-fill"></i>
+              </div>
+              <div>
+                <h3 class="algo-info-title">FIFO</h3>
+                <p class="algo-info-subtitle">First-In, First-Out</p>
+              </div>
+            </div>
+            
+            <p class="algo-info-description">
+              Replaces the oldest page in memory, regardless of usage frequency.
+            </p>
+            
+            <div class="algo-info-specs">
+              <div class="algo-spec-item">
+                <i class="bi bi-speedometer2"></i>
+                <div>
+                  <span class="spec-label">Complexity</span>
+                  <span class="spec-value">O(1)</span>
+                </div>
+              </div>
+              <div class="algo-spec-item">
+                <i class="bi bi-stack"></i>
+                <div>
+                  <span class="spec-label">Structure</span>
+                  <span class="spec-value">Queue</span>
+                </div>
+              </div>
+            </div>
+            
+            <ul class="algo-info-features">
+              <li class="feature-pro">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>Simple implementation</span>
+              </li>
+              <li class="feature-pro">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>Low overhead</span>
+              </li>
+              <li class="feature-con">
+                <i class="bi bi-x-circle-fill"></i>
+                <span>Belady's Anomaly</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="card algo-info-card">
+            <div class="algo-info-header">
+              <div class="algo-info-icon lru-icon">
+                <i class="bi bi-clock-history"></i>
+              </div>
+              <div>
+                <h3 class="algo-info-title">LRU</h3>
+                <p class="algo-info-subtitle">Least Recently Used</p>
+              </div>
+            </div>
+            
+            <p class="algo-info-description">
+              Replaces the page that hasn't been accessed for the longest time period.
+            </p>
+            
+            <div class="algo-info-specs">
+              <div class="algo-spec-item">
+                <i class="bi bi-speedometer2"></i>
+                <div>
+                  <span class="spec-label">Complexity</span>
+                  <span class="spec-value">O(1)</span>
+                </div>
+              </div>
+              <div class="algo-spec-item">
+                <i class="bi bi-stack"></i>
+                <div>
+                  <span class="spec-label">Structure</span>
+                  <span class="spec-value">Stack/Map</span>
+                </div>
+              </div>
+            </div>
+            
+            <ul class="algo-info-features">
+              <li class="feature-pro">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>Optimal performance</span>
+              </li>
+              <li class="feature-pro">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>No anomaly</span>
+              </li>
+              <li class="feature-con">
+                <i class="bi bi-x-circle-fill"></i>
+                <span>More complex</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="alert alert-info" style="margin-top: 2rem;">
+          <i class="bi bi-info-circle" style="font-size: 1.5rem;"></i>
+          <div>
+            <strong style="display: block; margin-bottom: 0.25rem;">Understanding Page Faults</strong>
+            <span style="font-size: 14px; opacity: 0.9;">
+              A page fault occurs when a referenced page is not in memory and must be loaded from disk. 
+              Efficient algorithms minimize page faults to improve system performance.
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-main">
+        <div class="footer-info">
+          <div class="footer-brand-section">
+            <div class="footer-logo">
+              <i class="bi bi-cpu-fill"></i>
+              <span>Page Replacement Visualizer</span>
+            </div>
+            <p class="footer-tagline">
+              Interactive tool for understanding page replacement algorithms
+            </p>
+          </div>
+        </div>
+        
+        <div class="footer-divider"></div>
+        
+        <div class="footer-team">
+          <h4 class="team-label">Developed by</h4>
+          <div class="team-names">
+            <span class="team-member">Viron C. Bacani</span>
+            <span class="team-separator">•</span>
+            <span class="team-member">Nathalie B. Birao</span>
+            <span class="team-separator">•</span>
+            <span class="team-member">John Henry P. Labarento</span>
+            <span class="team-separator">•</span>
+            <span class="team-member">Christian A. Magin</span>
+            <span class="team-separator">•</span>
+            <span class="team-member">Kennmor M. Regua</span>
+          </div>
+        </div>
+        
+        <div class="footer-copyright">
+          <p>© 2026 Page Replacement Visualizer. Built for Operating Systems Education.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
+  <script type="module" src="./script/main.js"></script>
+  <script src="./script/effects/particleSystem.js"></script>
+</body>
+</html>
